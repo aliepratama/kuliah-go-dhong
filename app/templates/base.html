@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en" class="">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Smart Garden Manager{% endblock %}</title>
+    
+    <!-- TailwindCSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Alpine.js for reactive UI -->
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    
+    <!-- HTMX for AJAX -->
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    
+    <!-- Chart.js for visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    
+    <!-- Google Fonts: Space Mono (Monospace) + Archivo Black (Bold Sans) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Archivo+Black&display=swap" rel="stylesheet">
+    
+    <!-- Phosphor Icons (Professional Icons) -->
+    <script src="https://unpkg.com/@phosphor-icons/web@2.0.3"></script>
+    
+    <!-- Custom Tailwind Config: Neo-Brutalism -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'brutal-bg': '#F4F1EA',      // Recycled paper cream
+                        'brutal-white': '#FAFAFA',   // Off-white cards
+                        'brutal-green': '#00A86B',   // Jade green (healthy plants)
+                        'brutal-red': '#FF4D4D',     // Coral red (critical)
+                        'brutal-yellow': '#FFD027',  // Sunflower yellow (warning)
+                        'brutal-black': '#1A1A1A',   // Deep black borders
+                        'brutal-gray': '#6B6B6B',    // Mid gray for text
+                    },
+                    boxShadow: {
+                        'neo': '4px 4px 0px 0px #1A1A1A',       // Button shadow
+                        'neo-sm': '2px 2px 0px 0px #1A1A1A',    // Pressed state
+                        'neo-card': '8px 8px 0px 0px #1A1A1A',  // Card shadow
+                        'neo-lg': '12px 12px 0px 0px #1A1A1A',  // Large panels
+                    },
+                    borderWidth: {
+                        '3': '3px',
+                        '4': '4px',
+                    },
+                    fontFamily: {
+                        'mono': ['Space Mono', 'Courier New', 'monospace'],
+                        'sans': ['Archivo Black', 'Arial Black', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Custom Neo-Brutalism CSS -->
+    <style>
+        body {
+            font-family: 'Space Mono', monospace;
+            background: #F4F1EA;
+            color: #1A1A1A;
+        }
+        
+        /* Brutal Button */
+        .btn-brutal {
+            @apply bg-brutal-green border-3 border-brutal-black shadow-neo;
+            @apply hover:shadow-neo-sm hover:translate-x-[2px] hover:translate-y-[2px];
+            @apply active:shadow-none active:translate-x-[4px] active:translate-y-[4px];
+            @apply transition-all duration-100;
+            @apply px-6 py-3 font-bold uppercase tracking-wider text-white;
+            @apply cursor-pointer;
+        }
+        
+        /* Card/Panel */
+        .card-brutal {
+            @apply bg-brutal-white border-3 border-brutal-black shadow-neo-card;
+            @apply p-6;
+        }
+        
+        /* Grid Cell for Garden Map */
+        .grid-cell {
+            @apply aspect-square border-3 border-brutal-black bg-brutal-white;
+            @apply flex flex-col items-center justify-center cursor-pointer;
+            @apply hover:bg-brutal-yellow transition-colors duration-150;
+            @apply relative;
+        }
+        
+        /* Input Fields */
+        .input-brutal {
+            @apply border-3 border-brutal-black px-4 py-2 font-mono;
+            @apply focus:outline-none focus:ring-0 focus:border-brutal-green;
+            @apply transition-colors;
+        }
+        
+        /* Headers */
+        h1, h2, h3 {
+            font-family: 'Archivo Black', sans-serif;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body class="bg-brutal-bg text-brutal-black min-h-screen">
+    <!-- Navbar -->
+    {% include "components/navbar.html" %}
+    
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-6">
+        {% block content %}{% endblock %}
+    </main>
+    
+    <!-- Global Modal Container -->
+    <div id="modal-container"></div>
+    
+    <!-- Footer -->
+    <footer class="bg-brutal-black text-white py-3 mt-8">
+        <div class="container mx-auto px-4 text-center">
+            <p class="font-mono text-xs flex items-center justify-center gap-2">
+                <i class="ph-fill ph-plant"></i>
+                <span class="font-bold">GO-DHONG v2.0</span> | WebApp by Alie Pratama
+            </p>
+        </div>
+    </footer>
+    
+    {% block scripts %}{% endblock %}
+</body>
+</html>

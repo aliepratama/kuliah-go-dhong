@@ -1,0 +1,28 @@
+<!-- Navbar Component -->
+<nav class="bg-brutal-white border-b-4 border-brutal-black shadow-neo-sm sticky top-0 z-40">
+    <div class="container mx-auto px-4 py-3">
+        <div class="flex items-center justify-between">
+            <!-- Logo -->
+            <div class="flex items-center gap-3">
+                <i class="ph-fill ph-plant text-3xl text-brutal-green"></i>
+                <div>
+                    <h1 class="text-xl font-sans font-black">GO-DHONG</h1>
+                    <p class="text-xs font-mono text-brutal-gray">Garden Manager v2.0</p>
+                </div>
+            </div>
+            
+            <!-- Navigation Buttons -->
+            <div class="flex gap-2">
+                <a href="/" class="px-4 py-2 border-3 border-brutal-black font-mono font-bold uppercase hover:bg-brutal-yellow transition-colors {% if request.url.path == '/' %}bg-brutal-yellow{% else %}bg-brutal-white{% endif %}">
+                    <i class="ph-bold ph-map-trifold"></i> Garden
+                </a>
+                <a href="/history" class="px-4 py-2 border-3 border-brutal-black bg-brutal-white font-mono font-bold uppercase hover:bg-brutal-yellow transition-colors {% if request.url.path == '/history' %}bg-brutal-yellow{% endif %}">
+                    <i class="ph-bold ph-archive-box"></i> History
+                </a>
+                <a href="/guide" class="px-4 py-2 border-3 border-brutal-black bg-brutal-white font-mono font-bold uppercase hover:bg-brutal-yellow transition-colors {% if request.url.path == '/guide' %}bg-brutal-yellow{% endif %}">
+                    <i class="ph-bold ph-book-open"></i> Petunjuk
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>

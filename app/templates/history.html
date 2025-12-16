@@ -1,0 +1,210 @@
+{% extends "base.html" %}
+
+{% block title %}Riwayat Scan{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8"
+     x-data='{
+        scans: {{ scans_json|tojson }},
+        search: "",
+        plantId: "",
+        coinDetected: "",
+        page: 1,
+        perPage: 10,
+        
+        get filteredScans() {
+            return this.scans.filter(scan => {
+                const matchesSearch = this.search === "" || 
+                    scan.plant_name.toLowerCase().includes(this.search.toLowerCase()) || 
+                    scan.id.toString().includes(this.search);
+                const matchesPlant = this.plantId === "" || scan.plant_id == this.plantId;
+                const matchesCoin = this.coinDetected === "" || 
+                    (this.coinDetected === "true" && scan.coin_detected) || 
+                    (this.coinDetected === "false" && !scan.coin_detected);
+                return matchesSearch && matchesPlant && matchesCoin;
+            });
+        },
+        
+        get totalPages() {
+            return Math.ceil(this.filteredScans.length / this.perPage);
+        },
+        
+        get paginatedScans() {
+            const start = (this.page - 1) * this.perPage;
+            const end = start + this.perPage;
+            return this.filteredScans.slice(start, end);
+        },
+        
+        formatDate(dateString) {
+            return new Date(dateString).toLocaleDateString("id-ID", {
+                day: "numeric", month: "short", year: "numeric",
+                hour: "2-digit", minute: "2-digit"
+            });
+        }
+     }'
+     x-effect="page = 1; search; plantId; coinDetected">
+
+    <div class="mb-6">
+        <h1 class="text-4xl font-sans font-black mb-2 flex items-center gap-3">
+            <i class="ph-bold ph-archive-box text-brutal-green"></i>
+            RIWAYAT SCAN
+        </h1>
+        <p class="font-mono text-brutal-gray">
+            <span x-text="filteredScans.length"></span> total scan - Halaman <span x-text="page"></span>/<span x-text="totalPages || 1"></span>
+        </p>
+    </div>
+
+    <!-- Filters & Search -->
+    <div class="card-brutal mb-6">
+        <div class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <!-- Search -->
+                <div>
+                    <label class="block font-mono font-bold text-xs mb-2">
+                        <i class="ph-bold ph-magnifying-glass"></i> CARI (NAMA/ID)
+                    </label>
+                    <input type="text" 
+                           x-model="search"
+                           placeholder="Cari tanaman atau ID scan..."
+                           class="input-brutal w-full">
+                </div>
+                
+                <!-- Filter by Plant -->
+                <div>
+                    <label class="block font-mono font-bold text-xs mb-2">
+                        <i class="ph-bold ph-plant"></i> TANAMAN
+                    </label>
+                    <select x-model="plantId"
+                            class="input-brutal w-full">
+                        <option value="">Semua Tanaman</option>
+                        {% for plant in all_plants %}
+                        <option value="{{ plant.id }}">{{ plant.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <!-- Filter by Coin -->
+                <div>
+                    <label class="block font-mono font-bold text-xs mb-2">
+                        <i class="ph-bold ph-coin"></i> STATUS KOIN
+                    </label>
+                    <select x-model="coinDetected"
+                            class="input-brutal w-full">
+                        <option value="">Semua</option>
+                        <option value="true">Dengan Koin</option>
+                        <option value="false">Tanpa Koin</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="flex gap-2">
+                <button @click="search = ''; plantId = ''; coinDetected = ''" 
+                        x-show="search || plantId || coinDetected"
+                        class="btn-brutal bg-brutal-white border-3 border-brutal-black">
+                    <i class="ph-bold ph-x"></i> RESET SEMUA
+                </button>
+                <span class="font-mono text-xs text-brutal-gray flex items-center">
+                    Filter otomatis diterapkan saat Anda mengubah pilihan
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scan History Cards -->
+    <div class="space-y-4">
+        <template x-for="scan in paginatedScans" :key="scan.id">
+            <div class="card-brutal hover:shadow-neo-lg transition-shadow cursor-pointer"
+                 @click="htmx.ajax('GET', `/api/scan-detail-modal/${scan.id}`, '#modal-container')"
+                 hx-swap="innerHTML">
+                <div class="flex items-start gap-4">
+                    <!-- Thumbnail -->
+                    <div class="border-3 border-brutal-black w-24 h-24 flex-shrink-0 bg-brutal-bg flex items-center justify-center overflow-hidden">
+                        <template x-if="scan.segmented_image_path">
+                            <img :src="scan.segmented_image_path" 
+                                 :alt="`Scan ${scan.id}`"
+                                 class="w-full h-full object-cover">
+                        </template>
+                        <template x-if="!scan.segmented_image_path">
+                            <i class="ph-bold ph-image text-3xl text-brutal-gray"></i>
+                        </template>
+                    </div>
+                    
+                    <!-- Info -->
+                    <div class="flex-1">
+                        <div class="flex items-center justify-between mb-2">
+                            <h3 class="font-sans font-black text-lg" x-text="scan.plant_name"></h3>
+                            <span class="font-mono text-xs text-brutal-gray" x-text="formatDate(scan.created_at)"></span>
+                        </div>
+                        
+                        <div class="flex items-center gap-4 flex-wrap">
+                            <!-- Leaf Area -->
+                            <div class="flex items-center gap-2">
+                                <i class="ph-bold ph-plant text-brutal-green"></i>
+                                <span class="font-mono font-bold" x-text="`${scan.leaf_area_cm2.toFixed(2)} cm²`"></span>
+                            </div>
+                            
+                            <!-- Coin Status -->
+                            <div class="flex items-center gap-2">
+                                <template x-if="scan.coin_detected">
+                                    <div class="flex items-center gap-2">
+                                        <i class="ph-bold ph-check-circle text-brutal-yellow"></i>
+                                        <span class="font-mono text-xs">Koin terdeteksi</span>
+                                    </div>
+                                </template>
+                                <template x-if="!scan.coin_detected">
+                                    <div class="flex items-center gap-2">
+                                        <i class="ph-bold ph-warning text-brutal-red"></i>
+                                        <span class="font-mono text-xs">Tanpa koin</span>
+                                    </div>
+                                </template>
+                            </div>
+                            
+                            <!-- Scan ID Badge -->
+                            <div class="ml-auto flex items-center gap-2 bg-brutal-bg px-2 py-1 border-2 border-brutal-black">
+                                <i class="ph-bold ph-barcode text-brutal-gray"></i>
+                                <span class="font-mono text-xs font-bold" x-text="`#${scan.id}`"></span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Arrow -->
+                    <div class="flex items-center">
+                        <i class="ph-bold ph-caret-right text-2xl text-brutal-gray"></i>
+                    </div>
+                </div>
+            </div>
+        </template>
+        
+        <!-- Empty State -->
+        <div x-show="filteredScans.length === 0" class="text-center py-16">
+            <i class="ph-bold ph-archive-box text-6xl mb-4 text-brutal-gray"></i>
+            <p class="font-mono text-lg font-bold text-brutal-gray">TIDAK ADA DATA</p>
+            <p class="font-mono text-sm text-brutal-gray mt-2">
+                Coba ubah filter atau kata kunci pencarian
+            </p>
+        </div>
+    </div>
+    
+    <!-- Pagination -->
+    <div class="mt-8 flex items-center justify-center gap-2" x-show="totalPages > 1">
+        <!-- Previous -->
+        <button @click="page = Math.max(1, page - 1)"
+                :disabled="page === 1"
+                :class="page === 1 ? 'bg-brutal-bg border-brutal-gray text-brutal-gray cursor-not-allowed' : 'bg-brutal-white border-brutal-black hover:bg-brutal-yellow'"
+                class="px-4 py-2 border-3 font-mono font-bold transition-colors">
+            <i class="ph-bold ph-caret-left"></i> PREV
+        </button>
+        
+        <!-- Page Info -->
+        <span class="px-4 py-2 bg-brutal-yellow border-3 border-brutal-black font-mono font-bold" x-text="page"></span>
+        
+        <!-- Next -->
+        <button @click="page = Math.min(totalPages, page + 1)"
+                :disabled="page === totalPages"
+                :class="page === totalPages ? 'bg-brutal-bg border-brutal-gray text-brutal-gray cursor-not-allowed' : 'bg-brutal-white border-brutal-black hover:bg-brutal-yellow'"
+                class="px-4 py-2 border-3 font-mono font-bold transition-colors">
+            NEXT <i class="ph-bold ph-caret-right"></i>
+        </button>
+    </div>
+</div>
+{% endblock %}

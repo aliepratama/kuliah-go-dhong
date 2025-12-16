@@ -1,0 +1,66 @@
+<!-- Garden Edit Modal -->
+<div class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4"
+     id="garden-edit-modal">
+    <div class="bg-brutal-white border-4 border-brutal-black shadow-neo-lg max-w-md w-full p-6">
+        <div class="border-b-3 border-brutal-black pb-3 mb-4">
+            <h3 class="text-xl font-sans font-black">EDIT GARDEN</h3>
+            <p class="text-xs font-mono text-brutal-gray mt-1">Ubah nama atau deskripsi garden</p>
+        </div>
+        
+        <form hx-put="/api/gardens/{{ garden_id }}"
+              hx-swap="none"
+              class="space-y-4">
+            
+            <!-- Garden Name -->
+            <div>
+                <label class="block font-mono font-bold text-sm mb-2">
+                    NAMA GARDEN *
+                </label>
+                <input type="text" 
+                       name="name" 
+                       required
+                       value="{{ garden_name }}"
+                       class="input-brutal w-full">
+            </div>
+            
+            <!-- Description -->
+            <div>
+                <label class="block font-mono font-bold text-sm mb-2">
+                    DESKRIPSI
+                </label>
+                <textarea name="description" 
+                          rows="2"
+                          class="input-brutal w-full resize-none">{{ garden_description if garden_description else '' }}</textarea>
+            </div>
+            
+            <!-- Info -->
+            <div class="border-2 border-brutal-yellow bg-brutal-yellow/20 p-3">
+                <p class="font-mono text-xs flex items-center gap-1">
+                    <i class="ph-bold ph-info"></i>
+                    Ukuran grid tidak bisa diubah setelah garden dibuat
+                </p>
+            </div>
+            
+            <!-- Buttons -->
+            <div class="flex gap-3 pt-4 border-t-3 border-brutal-black">
+                <button type="button"
+                        onclick="document.getElementById('modal-container').innerHTML = ''"
+                        class="flex-1 px-4 py-2 font-mono font-bold uppercase hover:bg-gray-200 transition-colors">
+                    Batal
+                </button>
+                <button type="submit"
+                        class="flex-1 btn-brutal border-3 border-brutal-black">
+                    Simpan
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.body.addEventListener('htmx:afterRequest', function(event) {
+        if (event.detail.successful) {
+            window.location.reload();
+        }
+    });
+</script>

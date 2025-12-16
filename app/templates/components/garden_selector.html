@@ -1,0 +1,61 @@
+<!-- Garden Selector Component -->
+<div class="mb-4 p-4 border-3 border-brutal-black bg-brutal-white shadow-neo flex items-center justify-between">
+    <!-- Left: Garden Info -->
+    <div class="flex items-center gap-3">
+        <i class="ph-bold ph-map-pin-line text-2xl text-brutal-green"></i>
+        <div>
+            <h3 class="font-sans font-black text-lg">{{ garden.name if garden else "Belum Ada Garden" }}</h3>
+            <p class="font-mono text-xs text-brutal-gray">
+                {% if garden %}
+                    {{ garden.rows }}×{{ garden.cols}} Grid | {{ plants_grid|length }} tanaman
+                {% else %}
+                    Buat garden pertama Anda
+                {% endif %}
+            </p>
+        </div>
+    </div>
+    
+    <!-- Right: Actions -->
+    <div class="flex items-center gap-2">
+        <!-- Garden Selector Dropdown -->
+        {% if all_gardens|length > 1 %}
+        <select onchange="window.location.href='/?garden_id=' + this.value"
+                class="px-3 py-2 border-3 border-brutal-black font-mono font-bold text-sm bg-brutal-white hover:bg-brutal-yellow transition-colors cursor-pointer">
+            {% for g in all_gardens %}
+            <option value="{{ g.id }}" {% if garden and g.id == garden.id %}selected{% endif %}>
+                {{ g.name }} ({{ g.rows }}×{{ g.cols }})
+            </option>
+            {% endfor %}
+        </select>
+        {% endif %}
+        
+        <!-- Edit Garden Button (if garden exists) -->
+        {% if garden %}
+        <button class="px-3 py-2 border-3 border-brutal-black bg-brutal-yellow text-brutal-black font-mono font-bold text-xs uppercase hover:bg-yellow-400 transition-colors flex items-center gap-1"
+                hx-get="/api/garden-edit-modal/{{ garden.id }}"
+                hx-target="#modal-container"
+                hx-swap="innerHTML">
+            <i class="ph-bold ph-pencil-simple"></i>
+            Edit
+        </button>
+        
+        <!-- Delete Garden Button (with modal confirmation) -->
+        <button class="px-3 py-2 border-3 border-brutal-black bg-brutal-red text-white font-mono font-bold text-xs uppercase hover:bg-red-600 transition-colors flex items-center gap-1"
+                hx-get="/api/delete-garden-modal/{{ garden.id }}"
+                hx-target="#modal-container"
+                hx-swap="innerHTML">
+            <i class="ph-bold ph-trash"></i>
+            Hapus
+        </button>
+        {% endif %}
+        
+        <!-- New Garden Button -->
+        <button class="px-3 py-2 border-3 border-brutal-black bg-brutal-green text-white font-mono font-bold text-xs uppercase hover:bg-green-600 transition-colors flex items-center gap-1"
+                hx-get="/api/garden-config-modal"
+                hx-target="#modal-container"
+                hx-swap="innerHTML">
+            <i class="ph-bold ph-plus"></i>
+            Garden Baru
+        </button>
+    </div>
+</div>

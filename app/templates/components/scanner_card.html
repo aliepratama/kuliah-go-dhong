@@ -1,0 +1,90 @@
+<!-- Scanner Card Component -->
+<div x-data="{ imagePreview: null, scanning: false }">
+    <h3 class="text-lg font-semibold mb-4 flex items-center">
+        <span class="mr-2">📸</span> Smart Scanner
+    </h3>
+    
+    <form 
+        hx-post="/api/scan" 
+        hx-encoding="multipart/form-data"
+        hx-target="#scan-result"
+        @htmx:before-send="scanning = true"
+        @htmx:after-request="scanning = false"
+        class="space-y-4"
+    >
+        <!-- File Input -->
+        <div class="relative">
+            <input 
+                type="file" 
+                name="file" 
+                accept="image/*"
+                required
+                @change="imagePreview = URL.createObjectURL($event.target.files[0])"
+                class="block w-full text-sm text-gray-400
+                    file:mr-4 file:py-2 file:px-4
+                    file:rounded-full file:border-0
+                    file:text-sm file:font-semibold
+                    file:bg-green-500 file:text-white
+                    hover:file:bg-green-600
+                    file:cursor-pointer
+                    cursor-pointer"
+            >
+        </div>
+        
+        <!-- Image Preview -->
+        <div x-show="imagePreview" x-transition class="mt-4">
+            <img :src="imagePreview" alt="Preview" class="w-full rounded-lg border-2 border-gray-700">
+        </div>
+        
+        <!-- Submit Button -->
+        <button 
+            type="submit"
+            class="w-full bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 
+                   text-white font-semibold py-3 px-6 rounded-lg transition-all transform hover:scale-105
+                   disabled:opacity-50 disabled:cursor-not-allowed"
+            :disabled="scanning"
+        >
+            <span x-show="!scanning">🚀 Analyze Leaf</span>
+            <span x-show="scanning" class="flex items-center justify-center">
+                <svg class="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Scanning...
+            </span>
+        </button>
+    </form>
+    
+    <!-- Result Area -->
+    <div id="scan-result" class="mt-6 space-y-4"></div>
+</div>
+
+<!-- HTMX Response Template (handled by Alpine) -->
+<script>
+    document.body.addEventListener('htmx:afterRequest', function(event) {
+        if (event.detail.target.id === 'scan-result') {
+            const response = JSON.parse(event.detail.xhr.response);
+            
+            if (response.success) {
+                event.detail.target.innerHTML = `
+                    <div class="bg-green-500/10 border border-green-500/50 rounded-lg p-4 animate-fade-in">
+                        <p class="text-green-400 font-semibold mb-2">✓ Analysis Complete!</p>
+                        <p class="text-sm text-gray-300">Leaf Area: <span class="font-bold text-green-400">${response.leaf_area_cm2.toFixed(2)} cm²</span></p>
+                        ${response.coin_detected ? 
+                            '<p class="text-xs text-gray-400 mt-1">✓ Coin reference detected</p>' : 
+                            '<p class="text-xs text-yellow-400 mt-1">⚠ No coin detected</p>'
+                        }
+                        <img src="${response.segmented_image}" class="mt-3 w-full rounded border border-gray-700">
+                    </div>
+                `;
+            } else {
+                event.detail.target.innerHTML = `
+                    <div class="bg-red-500/10 border border-red-500/50 rounded-lg p-4">
+                        <p class="text-red-400 font-semibold">✗ Error</p>
+                        <p class="text-sm text-gray-300">${response.error || 'Processing failed'}</p>
+                    </div>
+                `;
+            }
+        }
+    });
+</script>

@@ -1,0 +1,57 @@
+<!-- Delete Garden Confirmation Modal -->
+<div class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4"
+     id="delete-garden-modal">
+    <div class="bg-brutal-white border-4 border-brutal-black shadow-neo-lg max-w-md w-full p-6">
+        <div class="border-b-3 border-brutal-black pb-3 mb-4">
+            <h3 class="text-xl font-sans font-black text-brutal-red flex items-center gap-2">
+                <i class="ph-bold ph-warning"></i>
+                HAPUS GARDEN
+            </h3>
+            <p class="text-xs font-mono text-brutal-gray mt-1">Tindakan ini tidak dapat dibatalkan!</p>
+        </div>
+        
+        <div class="space-y-4">
+            <!-- Warning Message -->
+            <div class="border-3 border-brutal-red bg-brutal-red/10 p-4">
+                <p class="font-mono font-bold text-sm mb-2">Yakin ingin menghapus garden ini?</p>
+                <p class="font-mono text-xs text-brutal-gray">• Garden: <span class="font-bold">{{ garden_name }}</span></p>
+                <p class="font-mono text-xs text-brutal-gray">• Ukuran: {{ garden_size }}</p>
+                <p class="font-mono text-xs text-brutal-gray">• Jumlah tanaman: {{ plant_count }}</p>
+            </div>
+            
+            <div class="border-l-4 border-brutal-red bg-brutal-red/5 p-3">
+                <p class="font-mono text-xs font-bold text-brutal-red">
+                    ⚠️ SEMUA DATA AKAN TERHAPUS:
+                </p>
+                <ul class="font-mono text-xs text-brutal-gray mt-2 space-y-1 ml-4">
+                    <li>• {{ plant_count }} tanaman di garden ini</li>
+                    <li>• Semua riwayat scan daun</li>
+                    <li>• Foto-foto segmentasi</li>
+                </ul>
+            </div>
+            
+            <!-- Buttons -->
+            <div class="flex gap-3 pt-4 border-t-3 border-brutal-black">
+                <button type="button"
+                        onclick="document.getElementById('modal-container').innerHTML = ''"
+                        class="flex-1 px-4 py-2 bg-brutal-white border-3 border-brutal-black font-mono font-bold uppercase hover:bg-gray-200 transition-colors">
+                    Batal
+                </button>
+                <button type="button"
+                        onclick="fetch('/api/gardens/{{ garden_id }}', {method: 'DELETE'})
+                            .then(r => r.json())
+                            .then(d => { 
+                                if(d.success) {
+                                    window.location.href='/'; 
+                                } else {
+                                    alert('Gagal menghapus garden: ' + (d.error || 'Unknown error'));
+                                }
+                            })
+                            .catch(err => alert('Error: ' + err));"
+                        class="flex-1 px-4 py-2 bg-brutal-red text-white border-3 border-brutal-black font-mono font-bold uppercase hover:bg-red-600 transition-colors">
+                    <i class="ph-bold ph-trash"></i> HAPUS
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

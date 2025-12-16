@@ -1,0 +1,65 @@
+<!-- Add Plant Modal (HTMX Target) -->
+<div class="fixed inset-0 bg-black/70 flex items-center justify-center z-50" 
+     id="add-plant-modal">
+    <div class="bg-brutal-white border-4 border-brutal-black shadow-neo-lg max-w-md w-full mx-4 p-6">
+        <div class="border-b-3 border-brutal-black pb-3 mb-4">
+            <h3 class="text-xl font-sans font-black">TAMBAH TANAMAN BARU</h3>
+            <p class="text-xs font-mono text-brutal-gray mt-1">Plot: {{ grid_x }}-{{ grid_y }}</p>
+        </div>
+        
+        <form hx-post="/api/plants"
+              hx-swap="none"
+              class="space-y-4">
+            
+            <!-- Hidden fields for grid position and garden -->
+            <input type="hidden" name="grid_x" value="{{ grid_x }}">
+            <input type="hidden" name="grid_y" value="{{ grid_y }}">
+            <input type="hidden" name="garden_id" value="{{ garden_id if garden_id else '' }}">
+            
+            <!-- Plant Name -->
+            <div>
+                <label class="block font-mono font-bold text-sm mb-2">
+                    NAMA TANAMAN *
+                </label>
+                <input type="text" 
+                       name="name" 
+                       required
+                       placeholder="Misal: Pepaya Calina A1"
+                       class="input-brutal w-full">
+            </div>
+            
+            <!-- Notes (Optional) -->
+            <div>
+                <label class="block font-mono font-bold text-sm mb-2">
+                    CATATAN (OPSIONAL)
+                </label>
+                <textarea name="notes" 
+                          rows="3"
+                          placeholder="Varietas, tanggal mulai benih, dll..."
+                          class="input-brutal w-full resize-none"></textarea>
+            </div>
+            
+            <!-- Buttons -->
+            <div class="flex gap-3 pt-4 border-t-3 border-brutal-black">
+                <button type="button"
+                        onclick="document.getElementById('modal-container').innerHTML = ''"
+                        class="flex-1 px-4 py-2 font-mono font-bold uppercase hover:bg-gray-200 transition-colors">
+                    Batal
+                </button>
+                <button type="submit"
+                        class="flex-1 btn-brutal border-3 border-brutal-black">
+                    Simpan
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Auto-reload page after successful plant addition
+    document.body.addEventListener('htmx:afterRequest', function(evt) {
+        if (evt.detail.successful && evt.detail.target.tagName === 'FORM') {
+            window.location.reload();
+        }
+    });
+</script>

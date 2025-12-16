@@ -1,0 +1,123 @@
+<!-- Plant Inspector Panel (Right Side) -->
+<div id="plant-inspector" class="card-brutal min-h-[600px]"
+     {% if plant %}
+     hx-get="/api/plant-detail-by-id/{{ plant.id }}"
+     hx-trigger="scanCompleted from:body"
+     hx-target="#plant-inspector"
+     hx-swap="outerHTML"
+     {% endif %}>
+    {% if plant %}
+    <div class="space-y-4">
+        <!-- Header -->
+        <div class="border-b-3 border-brutal-black pb-3">
+            <h3 class="text-lg font-sans font-black">
+                PLOT {{ plant.grid_x }}-{{ plant.grid_y }}
+            </h3>
+            <p class="font-mono text-sm text-brutal-gray mt-1">{{ plant.name }}</p>
+        </div>
+        
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-2 gap-3">
+            <div class="border-3 border-brutal-black p-3 text-center bg-brutal-white">
+                <p class="text-xs text-brutal-gray font-mono uppercase">Umur</p>
+                <p class="text-2xl font-bold font-mono">
+                    {% if plant.planted_at %}
+                        {% set age_seconds = (now - plant.planted_at).total_seconds() %}
+                        {% set age_days = (age_seconds / 86400)|int %}
+                        {{ age_days }} HR
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </p>
+            </div>
+            
+            <div class="border-3 border-brutal-black p-3 text-center bg-brutal-white">
+                <p class="text-xs text-brutal-gray font-mono uppercase">Luas Terakhir</p>
+                <p class="text-2xl font-bold font-mono text-brutal-green">
+                    {% if latest_scan %}
+                        {{ "%.1f"|format(latest_scan.leaf_area_cm2) }}
+                    {% else %}
+                        ---
+                    {% endif %}
+                    <span class="text-sm">cm²</span>
+                </p>
+            </div>
+        </div>
+        
+        <!-- Action Button -->
+        <button class="btn-brutal w-full"
+                hx-get="/scan-modal?plant_id={{ plant.id }}"
+                hx-target="#modal-container"
+                hx-swap="innerHTML">
+            + SCAN DAUN BARU
+        </button>
+        
+        <!-- Mini History with Pagination -->
+        <div class="border-3 border-brutal-black" x-data='{ page: 1, perPage: 5, scans: {{ scans_json|tojson }} }'>
+            <div class="bg-brutal-black text-white px-3 py-2">
+                <h4 class="font-mono font-bold text-xs uppercase">RIWAYAT SCAN</h4>
+            </div>
+            {% if plant.scans %}
+            <div class="divide-y-2 divide-brutal-black">
+                <template x-for="(scan, index) in scans.slice((page - 1) * perPage, page * perPage)" :key="scan.id">
+                    <div class="p-2 hover:bg-brutal-yellow/20 transition-colors cursor-pointer flex items-center justify-between"
+                         @click="htmx.ajax('GET', `/api/scan-detail-modal/${scan.id}`, '#modal-container')">
+                        <div class="flex items-center gap-2">
+                            <i class="ph-bold ph-leaf text-brutal-green"></i>
+                            <div>
+                                <p class="font-mono text-xs font-bold" x-text="`${scan.leaf_area_cm2.toFixed(2)} cm²`"></p>
+                                <p class="font-mono text-xs text-brutal-gray" x-text="new Date(scan.created_at).toLocaleDateString('id-ID', {day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'})"></p>
+                            </div>
+                        </div>
+                        <i class="ph-bold ph-caret-right text-brutal-gray"></i>
+                    </div>
+                </template>
+            </div>
+            
+            <!-- Pagination Controls -->
+            <div class="border-t-2 border-brutal-black bg-brutal-bg p-2 flex items-center justify-between" 
+                 x-show="scans.length > perPage">
+                <button @click="page = Math.max(1, page - 1)" 
+                        :disabled="page === 1"
+                        :class="page === 1 ? 'opacity-50 cursor-not-allowed' : 'hover:text-brutal-yellow'"
+                        class="font-mono text-xs font-bold">
+                    <i class="ph-bold ph-caret-left"></i> PREV
+                </button>
+                <span class="font-mono text-xs font-bold">
+                    <span x-text="page"></span> / <span x-text="Math.ceil(scans.length / perPage)"></span>
+                </span>
+                <button @click="page = Math.min(Math.ceil(scans.length / perPage), page + 1)" 
+                        :disabled="page === Math.ceil(scans.length / perPage)"
+                        :class="page === Math.ceil(scans.length / perPage) ? 'opacity-50 cursor-not-allowed' : 'hover:text-brutal-yellow'"
+                        class="font-mono text-xs font-bold">
+                    NEXT <i class="ph-bold ph-caret-right"></i>
+                </button>
+            </div>
+            {% else %}
+            <div class="p-4 text-center text-brutal-gray font-mono text-sm">
+                Belum ada scan
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- Notes Section -->
+        {% if plant.notes %}
+        <div class="border-3 border-brutal-yellow bg-brutal-yellow/20 p-3">
+            <p class="text-xs font-mono font-bold mb-1 flex items-center gap-1">
+                <i class="ph-bold ph-note"></i>
+                CATATAN:
+            </p>
+            <p class="text-xs font-mono">{{ plant.notes }}</p>
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+    {% if not plant %}
+    <!-- Empty State -->
+    <div class="text-center py-16">
+        <i class="ph-bold ph-plant text-6xl mb-4 text-brutal-gray"></i>
+        <p class="font-mono text-brutal-gray">Klik tanaman di grid untuk melihat detail</p>
+        <p class="font-mono text-xs mt-2">atau klik [+] untuk tambah tanaman baru</p>
+    </div>
+    {% endif %}
+</div>

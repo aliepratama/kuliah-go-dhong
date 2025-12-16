@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}Garden Map{% endblock %}
+
+{% block content %}
+<!-- Garden Selector -->
+{% include "components/garden_selector.html" %}
+
+<!-- New Dashboard Layout: 60% Map + 40% Inspector -->
+<div class="flex gap-4 min-h-[calc(100vh-200px)]">
+    <!-- LEFT: Garden Grid (60%) -->
+    <div class="w-3/5">
+        {% include "components/garden_grid.html" %}
+    </div>
+    
+    <!-- RIGHT: Plant Inspector (40%) -->
+    <div class="w-2/5">
+        {% include "components/plant_inspector.html" %}
+    </div>
+</div>
+{% endblock %}

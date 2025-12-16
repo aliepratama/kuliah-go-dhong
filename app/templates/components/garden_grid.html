@@ -1,0 +1,80 @@
+<!-- Garden Grid: Dynamic Size based on Garden Config -->
+<div class="card-brutal">
+    <h2 class="text-2xl font-sans font-black mb-4 border-b-3 border-brutal-black pb-2 flex items-center gap-2">
+        <i class="ph-bold ph-map-trifold text-brutal-green"></i>
+        PETA KEBUN
+        {% if garden %}
+        <span class="text-sm font-mono text-brutal-gray">({{ garden.rows}}×{{ garden.cols }})</span>
+        {% endif %}
+    </h2>
+    
+    {% if garden %}
+    <div class="grid gap-3" style="grid-template-columns: repeat({{ garden.cols }}, minmax(0, 1fr))">
+        {% for x in range(garden.rows) %}
+            {% for y in range(garden.cols) %}
+            {% set plant = plants_grid.get((x, y)) %}
+            
+            {% if plant %}
+            <!-- Plant Cell (Clickable) -->
+            <div class="border-3 border-brutal-black bg-brutal-white shadow-neo hover:shadow-neo-lg transition-shadow cursor-pointer aspect-square flex flex-col items-center justify-center p-4"
+                 hx-get="/api/plant-detail/{{ x }}/{{ y }}"
+                 hx-target="#plant-inspector"
+                 hx-swap="innerHTML"
+                 hx-trigger="click">
+                
+                <!-- Plant Icon -->
+                <i class="ph-fill ph-plant text-4xl text-brutal-green mb-2"></i>
+                
+                <!-- Plant Name Badge -->
+                <div class="text-center w-full border-t-2 border-brutal-black pt-2">
+                    <span class="font-mono font-bold text-xs">
+                        {{ plant.name[:8] }}
+                    </span>
+                </div>
+            </div>
+            {% else %}
+            <!-- Empty Slot -->
+            <div class="border-3 border-brutal-black bg-brutal-bg shadow-neo hover:shadow-neo-lg transition-shadow aspect-square flex items-center justify-center p-4">
+                <button class="w-full h-full flex items-center justify-center text-gray-400 text-5xl hover:text-brutal-green transition-colors"
+                        hx-get="/api/add-plant-modal/{{ x }}/{{ y }}?garden_id={{ garden.id if garden else '' }}"
+                        hx-target="#modal-container"
+                        hx-swap="innerHTML">
+                    <i class="ph-bold ph-plus"></i>
+                </button>
+            </div>
+            {% endif %}
+            {% endfor %}
+        {% endfor %}
+    </div>
+    {% else %}
+    <!-- No Garden State -->
+    <div class="text-center py-16">
+        <i class="ph-bold ph-plant text-6xl mb-4 text-brutal-gray"></i>
+        <p class="font-mono text-lg font-bold text-brutal-gray">BELUM ADA GARDEN</p>
+        <p class="font-mono text-sm text-brutal-gray mt-2">Buat garden pertama untuk mulai menanam!</p>
+        <button class="mt-6 btn-brutal inline-flex items-center gap-2"
+                hx-get="/api/garden-config-modal"
+                hx-target="#modal-container"
+                hx-swap="innerHTML">
+            <i class="ph-bold ph-plus"></i>
+            Buat Garden
+        </button>
+    </div>
+    {% endif %}
+    
+    <!-- Grid Legend -->
+    <div class="mt-4 flex items-center gap-4 text-xs font-mono border-t-2 border-brutal-black pt-3">
+        <div class="flex items-center gap-1">
+            <div class="w-4 h-4 bg-brutal-green border-2 border-brutal-black"></div>
+            <span>HEALTHY</span>
+        </div>
+        <div class="flex items-center gap-1">
+            <div class="w-4 h-4 bg-brutal-red border-2 border-brutal-black"></div>
+            <span>CRITICAL</span>
+        </div>
+        <div class="flex items-center gap-1">
+            <div class="w-4 h-4 bg-brutal-white border-2 border-brutal-black"></div>
+            <span>EMPTY</span>
+        </div>
+    </div>
+</div>

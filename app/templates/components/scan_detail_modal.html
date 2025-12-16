@@ -1,0 +1,118 @@
+<!-- Scan Detail Modal -->
+<div class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4"
+     id="scan-detail-modal">
+    <div class="bg-brutal-white border-4 border-brutal-black shadow-neo-lg max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+        <div class="sticky top-0 bg-brutal-white border-b-3 border-brutal-black p-6 pb-3 z-10">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-xl font-sans font-black">DETAIL HASIL SCAN</h3>
+                    <p class="text-xs font-mono text-brutal-gray mt-1">
+                        {% if scan.plant %}
+                        Tanaman: {{ scan.plant.name }} | 
+                        {% endif %}
+                        {{ scan.created_at.strftime('%d %b %Y, %H:%M') }}
+                    </p>
+                </div>
+                <button onclick="document.getElementById('modal-container').innerHTML = ''"
+                        class="text-2xl hover:text-brutal-red transition-colors">
+                    <i class="ph-bold ph-x"></i>
+                </button>
+            </div>
+        </div>
+        
+        <div class="p-6 space-y-4">
+            <!-- Image Preview -->
+            {% if scan.segmented_image_path %}
+            <div class="border-3 border-brutal-black">
+                <img src="{{ scan.segmented_image_path }}" 
+                     alt="Hasil Segmentasi"
+                     class="w-full h-auto">
+            </div>
+            {% endif %}
+            
+            <!-- Measurement Results -->
+            <div class="grid grid-cols-2 gap-4">
+                <!-- Leaf Area -->
+                <div class="card-brutal bg-brutal-green/10">
+                    <div class="text-center">
+                        <i class="ph-bold ph-plant text-4xl text-brutal-green mb-2"></i>
+                        <p class="font-mono text-xs text-brutal-gray uppercase mb-1">Luas Daun</p>
+                        <p class="font-sans font-black text-3xl text-brutal-green">
+                            {{ "%.2f"|format(scan.leaf_area_cm2) }}
+                            <span class="text-lg">cm²</span>
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Coin Detection -->
+                <div class="card-brutal {% if scan.coin_detected %}bg-brutal-yellow/10{% else %}bg-brutal-red/10{% endif %}">
+                    <div class="text-center">
+                        <i class="ph-bold ph-{% if scan.coin_detected %}check-circle{% else %}warning{% endif %} text-4xl {% if scan.coin_detected %}text-brutal-yellow{% else %}text-brutal-red{% endif %} mb-2"></i>
+                        <p class="font-mono text-xs text-brutal-gray uppercase mb-1">Status Koin</p>
+                        <p class="font-mono font-bold text-sm {% if scan.coin_detected %}text-brutal-yellow{% else %}text-brutal-red{% endif %}">
+                            {% if scan.coin_detected %}
+                            ✓ Terdeteksi
+                            {% else %}
+                            ✗ Tidak Terdeteksi
+                            {% endif %}
+                        </p>
+                        {% if not scan.coin_detected %}
+                        <p class="font-mono text-xs text-brutal-gray mt-1">
+                            Akurasi berkurang
+                        </p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Plant Info (if assigned) -->
+            {% if scan.plant %}
+            <div class="border-3 border-brutal-black bg-brutal-bg p-4">
+                <p class="font-mono font-bold text-sm mb-2">
+                    <i class="ph-bold ph-info"></i> INFORMASI TANAMAN
+                </p>
+                <div class="grid grid-cols-2 gap-2 font-mono text-xs">
+                    <div>
+                        <span class="text-brutal-gray">Nama:</span>
+                        <span class="font-bold ml-2">{{ scan.plant.name }}</span>
+                    </div>
+                    <div>
+                        <span class="text-brutal-gray">Posisi Grid:</span>
+                        <span class="font-bold ml-2">{{ scan.plant.grid_x }}-{{ scan.plant.grid_y }}</span>
+                    </div>
+                    {% if scan.plant.planted_at %}
+                    <div>
+                        <span class="text-brutal-gray">Ditanam:</span>
+                        <span class="font-bold ml-2">{{ scan.plant.planted_at.strftime('%d %b %Y') }}</span>
+                    </div>
+                    {% endif %}
+                    <div>
+                        <span class="text-brutal-gray">Status:</span>
+                        <span class="font-bold ml-2">{{ scan.plant.status.title() }}</span>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Scan Metadata -->
+            <div class="border-l-4 border-brutal-yellow bg-brutal-yellow/10 p-3">
+                <p class="font-mono text-xs">
+                    <i class="ph-bold ph-calendar"></i> 
+                    <span class="font-bold">Waktu Scan:</span> 
+                    {{ scan.created_at.strftime('%A, %d %B %Y pukul %H:%M:%S') }}
+                </p>
+                <p class="font-mono text-xs mt-1">
+                    <i class="ph-bold ph-barcode"></i> 
+                    <span class="font-bold">ID Scan:</span> 
+                    #{{ scan.id }}
+                </p>
+            </div>
+            
+            <!-- Close Button -->
+            <button onclick="document.getElementById('modal-container').innerHTML = ''"
+                    class="btn-brutal w-full border-3 border-brutal-black">
+                Tutup
+            </button>
+        </div>
+    </div>
+</div>

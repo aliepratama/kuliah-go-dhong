@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+
+{% block title %}Petunjuk Penggunaan{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <!-- Header -->
+    <div class="mb-8">
+        <h1 class="text-4xl font-sans font-black mb-2 flex items-center gap-3">
+            <i class="ph-bold ph-book-open text-brutal-green"></i>
+            PETUNJUK PENGGUNAAN
+        </h1>
+        <p class="font-mono text-brutal-gray">Panduan lengkap menggunakan Go-Dhong Garden Manager</p>
+    </div>
+
+    <!-- Step-by-Step Cards -->
+    <div class="space-y-6">
+        <!-- Step 1 -->
+        <div class="card-brutal">
+            <div class="flex items-start gap-4">
+                <div class="bg-brutal-green text-white border-3 border-brutal-black px-4 py-2 font-sans font-black text-2xl shadow-neo-sm flex-shrink-0">
+                    1
+                </div>
+                <div>
+                    <h3 class="font-sans font-black text-xl mb-2">Buat Garden Map Pertama Anda</h3>
+                    <p class="font-mono text-sm text-brutal-gray mb-3">
+                        Klik tombol <span class="font-bold">"New Garden"</span> di dashboard untuk membuat peta kebun baru. Tentukan ukuran grid (baris × kolom) sesuai kebutuhan, misalnya 4×4 untuk 16 plot tanaman.
+                    </p>
+                    <div class="border-l-4 border-brutal-yellow bg-brutal-yellow/10 p-3">
+                        <p class="font-mono text-xs"><i class="ph-bold ph-lightbulb"></i> <span class="font-bold">Tips:</span> Mulai dengan ukuran kecil (3×3 atau 4×4) untuk memudahkan monitoring!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="card-brutal">
+            <div class="flex items-start gap-4">
+                <div class="bg-brutal-green text-white border-3 border-brutal-black px-4 py-2 font-sans font-black text-2xl shadow-neo-sm flex-shrink-0">
+                    2
+                </div>
+                <div>
+                    <h3 class="font-sans font-black text-xl mb-2">Tambahkan Tanaman ke Plot</h3>
+                    <p class="font-mono text-sm text-brutal-gray mb-3">
+                        Klik tombol <span class="font-bold">[+]</span> pada grid kosong untuk menambah tanaman baru. Beri nama yang jelas (contoh: "Pepaya Calina A1") dan tambahkan catatan seperti tanggal tanam atau varietas.
+                    </p>
+                    <div class="border-l-4 border-brutal-yellow bg-brutal-yellow/10 p-3">
+                        <p class="font-mono text-xs"><i class="ph-bold ph-lightbulb"></i> <span class="font-bold">Tips:</span> Gunakan nama yang mudah diingat dan konsisten untuk tracking yang lebih baik!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="card-brutal">
+            <div class="flex items-start gap-4">
+                <div class="bg-brutal-green text-white border-3 border-brutal-black px-4 py-2 font-sans font-black text-2xl shadow-neo-sm flex-shrink-0">
+                    3
+                </div>
+                <div>
+                    <h3 class="font-sans font-black text-xl mb-2">Scan Daun dengan Koin Referensi</h3>
+                    <p class="font-mono text-sm text-brutal-gray mb-3">
+                        Klik tanaman di grid → klik <span class="font-bold">"+ SCAN DAUN BARU"</span>. Pilih metode (Upload atau Camera), lalu ambil foto daun <span class="font-bold text-brutal-red">WAJIB dengan koin 500 Rupiah</span> sebagai skala referensi.
+                    </p>
+                    <div class="border-l-4 border-brutal-red bg-brutal-red/10 p-3 mb-3">
+                        <p class="font-mono text-xs font-bold"><i class="ph-bold ph-warning"></i> PENTING: Koin HARUS terlihat jelas dalam foto untuk akurasi pengukuran!</p>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="border-2 border-brutal-black p-2 bg-brutal-bg">
+                            <p class="font-mono text-xs font-bold mb-1 text-center">✓ BENAR</p>
+                            <div class="bg-brutal-green/20 h-24 flex items-center justify-center border border-brutal-black">
+                                <p class="font-mono text-xs">Daun + Koin 500 terlihat jelas</p>
+                            </div>
+                        </div>
+                        <div class="border-2 border-brutal-black p-2 bg-brutal-bg">
+                            <p class="font-mono text-xs font-bold mb-1 text-center">✗ SALAH</p>
+                            <div class="bg-brutal-red/20 h-24 flex items-center justify-center border border-brutal-black">
+                                <p class="font-mono text-xs">Tanpa koin atau buram</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 4 -->
+        <div class="card-brutal">
+            <div class="flex items-start gap-4">
+                <div class="bg-brutal-green text-white border-3 border-brutal-black px-4 py-2 font-sans font-black text-2xl shadow-neo-sm flex-shrink-0">
+                    4
+                </div>
+                <div>
+                    <h3 class="font-sans font-black text-xl mb-2">Lihat Hasil & Riwayat Pertumbuhan</h3>
+                    <p class="font-mono text-sm text-brutal-gray mb-3">
+                        Setelah scan berhasil, luas daun (cm²) akan dihitung otomatis. Klik tanaman untuk melihat panel inspector yang menampilkan umur tanaman, luas daun terakhir, dan riwayat 5 scan terbaru.
+                    </p>
+                    <div class="border-l-4 border-brutal-yellow bg-brutal-yellow/10 p-3">
+                        <p class="font-mono text-xs"><i class="ph-bold ph-lightbulb"></i> <span class="font-bold">Tips:</span> Scan secara rutin (misal seminggu sekali) untuk tracking pertumbuhan yang akurat!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 5 -->
+        <div class="card-brutal">
+            <div class="flex items-start gap-4">
+                <div class="bg-brutal-green text-white border-3 border-brutal-black px-4 py-2 font-sans font-black text-2xl shadow-neo-sm flex-shrink-0">
+                    5
+                </div>
+                <div>
+                    <h3 class="font-sans font-black text-xl mb-2">Kelola Multiple Gardens</h3>
+                    <p class="font-mono text-sm text-brutal-gray mb-3">
+                        Anda bisa membuat beberapa garden map dengan ukuran berbeda (misal: Kebun Depan 3×3, Kebun Belakang 5×5). Gunakan dropdown di header dashboard untuk berpindah antar garden.
+                    </p>
+                    <ul class="font-mono text-xs space-y-1 mt-3">
+                        <li class="flex items-center gap-2"><i class="ph-bold ph-check text-brutal-green"></i> Edit nama/deskripsi garden</li>
+                        <li class="flex items-center gap-2"><i class="ph-bold ph-check text-brutal-green"></i> Set garden aktif</li>
+                        <li class="flex items-center gap-2"><i class="ph-bold ph-check text-brutal-green"></i> Hapus garden (dengan konfirmasi)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- FAQ Section -->
+        <div class="card-brutal bg-brutal-yellow/10 border-brutal-yellow">
+            <h3 class="font-sans font-black text-xl mb-4 flex items-center gap-2">
+                <i class="ph-bold ph-question"></i>
+                FAQ (Pertanyaan Umum)
+            </h3>
+            <div class="space-y-3">
+                <div>
+                    <p class="font-mono font-bold text-sm">Q: Apa yang terjadi jika koin tidak terdeteksi?</p>
+                    <p class="font-mono text-xs text-brutal-gray">A: Sistem akan tetap menghitung luas daun, tapi akurasi berkurang. Pastikan koin 500 Rupiah selalu terlihat jelas!</p>
+                </div>
+                <div>
+                    <p class="font-mono font-bold text-sm">Q: Berapa maksimal ukuran garden yang bisa dibuat?</p>
+                    <p class="font-mono text-xs text-brutal-gray">A: Maksimal 10×10 grid (100 plot). Untuk performa terbaik, disarankan maksimal 6×6.</p>
+                </div>
+                <div>
+                    <p class="font-mono font-bold text-sm">Q: Apakah data scan bisa dihapus?</p>
+                    <p class="font-mono text-xs text-brutal-gray">A: Saat ini data scan terikat dengan tanaman. Jika tanaman dihapus, semua data scan juga akan terhapus.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
