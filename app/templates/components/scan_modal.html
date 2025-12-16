@@ -6,6 +6,7 @@
          scanSuccess: false,
          useCamera: false,
          cameraStream: null,
+         dragover: false,
          async startCamera() {
              try {
                  this.cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
@@ -29,9 +30,37 @@
              canvas.height = video.videoHeight;
              canvas.getContext('2d').drawImage(video, 0, 0);
              this.imagePreview = canvas.toDataURL('image/jpeg');
-             this.$refs.fileInput.value = '';
+             
+             // Convert to file immediately
+             fetch(this.imagePreview)
+                .then(res => res.blob())
+                .then(blob => {
+                    const file = new File([blob], 'camera-capture.jpg', { type: 'image/jpeg' });
+                    const dataTransfer = new DataTransfer();
+                    dataTransfer.items.add(file);
+                    this.$refs.fileInput.files = dataTransfer.files;
+                });
+
              this.stopCamera();
              this.useCamera = false;
+         },
+         handleDrop(event) {
+             const files = event.dataTransfer.files;
+             if (files.length > 0 && files[0].type.startsWith('image/')) {
+                 this.$refs.fileInput.files = files;
+                 this.imagePreview = URL.createObjectURL(files[0]);
+             }
+         },
+         loadSample(url, name) {
+             fetch(url)
+                .then(r => r.blob())
+                .then(blob => {
+                    const file = new File([blob], name, {type: 'image/jpeg'});
+                    const dt = new DataTransfer();
+                    dt.items.add(file);
+                    this.$refs.fileInput.files = dt.files;
+                    this.imagePreview = URL.createObjectURL(file);
+                });
          }
      }"
      @toggle-camera.window="useCamera = !useCamera; useCamera ? startCamera() : stopCamera()"
@@ -49,154 +78,158 @@
                   hx-target="#scan-result"
                   @htmx:before-send="scanning = true"
                   @htmx:after-request="scanning = false"
-                  @submit="if(imagePreview && !$refs.fileInput.files.length) {
-                      // Convert base64 to file for camera capture
-                      fetch(imagePreview)
-                          .then(res => res.blob())
-                          .then(blob => {
-                              const file = new File([blob], 'camera-capture.jpg', { type: 'image/jpeg' });
-                              const dataTransfer = new DataTransfer();
-                              dataTransfer.items.add(file);
-                              $refs.fileInput.files = dataTransfer.files;
-                          });
-                  }"
+                  @submit="if(!imagePreview) { $event.preventDefault(); alert('Pilih gambar dulu!'); }"
                   class="space-y-4">
                 
                 <!-- Hidden plant_id -->
                 <input type="hidden" name="plant_id" value="{{ plant_id }}">
                 
-                <!-- Mode Toggle -->
-                <div class="flex gap-2 border-3 border-brutal-black p-2">
-                    <button type="button"
-                            @click="useCamera = false; imagePreview = null"
-                            :class="!useCamera ? 'bg-brutal-white border-3 border-brutal-black' : 'bg-gray-100'"
-                            class="flex-1 px-3 py-2 font-mono font-bold text-xs uppercase transition-colors">
-                        <i class="ph-bold ph-upload-simple"></i> Upload
-                    </button>
-                    <button type="button"
-                            @click="useCamera = true; imagePreview = null"
-                            :class="useCamera ? 'bg-brutal-white border-3 border-brutal-black' : 'bg-gray-100'"
-                            class="flex-1 px-3 py-2 font-mono font-bold text-xs uppercase transition-colors">
-                        <i class="ph-bold ph-camera"></i> Camera
-                    </button>
-                </div>
-                
-                <!-- File Upload Mode -->
-                <div x-show="!useCamera" class="space-y-3">
-                    <input type="file" 
-                           x-ref="fileInput"
-                           name="file" 
-                           accept="image/*" 
-                           required
-                           @change="imagePreview = URL.createObjectURL($event.target.files[0])"
-                           class="input-brutal w-full">
-                    
-                    <!-- Sample Images -->
-                    <div class="border-2 border-brutal-yellow bg-brutal-yellow/10 p-3">
-                        <p class="font-mono font-bold text-xs mb-2">
-                            <i class="ph-bold ph-images"></i> COBA GAMBAR SAMPEL:
+                <!-- INPUT SECTION (Shown when no preview) -->
+                <div x-show="!imagePreview && !scanSuccess">
+                    <!-- Mode Toggle -->
+                    <div class="flex gap-2 border-3 border-brutal-black p-2 mb-4">
+                        <button type="button"
+                                @click="useCamera = false"
+                                :class="!useCamera ? 'bg-brutal-white border-3 border-brutal-black shadow-neo' : 'bg-gray-100 text-gray-500'"
+                                class="flex-1 px-3 py-2 font-mono font-bold text-xs uppercase transition-all">
+                            <i class="ph-bold ph-upload-simple"></i> Upload
+                        </button>
+                        <button type="button"
+                                @click="useCamera = true"
+                                :class="useCamera ? 'bg-brutal-white border-3 border-brutal-black shadow-neo' : 'bg-gray-100 text-gray-500'"
+                                class="flex-1 px-3 py-2 font-mono font-bold text-xs uppercase transition-all">
+                            <i class="ph-bold ph-camera"></i> Camera
+                        </button>
+                    </div>
+
+                    <!-- Upload Mode -->
+                    <div x-show="!useCamera" class="space-y-4">
+                        <!-- Drag & Drop Zone -->
+                        <div @dragover.prevent="dragover = true"
+                             @dragleave="dragover = false"
+                             @drop.prevent="dragover = false; handleDrop($event)"
+                             @click="$refs.fileInput.click()"
+                             :class="dragover ? 'bg-brutal-yellow/20 border-brutal-yellow' : 'bg-gray-50 border-brutal-black'"
+                             class="border-3 border-dashed p-8 text-center cursor-pointer transition-colors group hover:bg-gray-100">
+                            
+                            <input type="file" 
+                                   x-ref="fileInput"
+                                   name="file" 
+                                   accept="image/*" 
+                                   class="hidden"
+                                   @change="if($event.target.files.length) imagePreview = URL.createObjectURL($event.target.files[0])">
+                            
+                            <div class="pointer-events-none">
+                                <i class="ph-bold ph-cloud-arrow-up text-4xl mb-2 text-brutal-black group-hover:scale-110 transition-transform"></i>
+                                <p class="font-mono font-bold text-sm">Klik atau Drag & Drop Gambar</p>
+                                <p class="font-mono text-xs text-brutal-gray mt-1">JPG, PNG (Max 5MB)</p>
+                            </div>
+                        </div>
+
+                        <!-- Sample Images -->
+                        <div class="border-2 border-brutal-black bg-brutal-bg p-3">
+                            <p class="font-mono font-bold text-xs mb-2 flex items-center gap-2">
+                                <i class="ph-bold ph-images"></i> ATAU COBA SAMPEL:
+                            </p>
+                            <div class="grid grid-cols-3 gap-2">
+                                <button type="button"
+                                        @click.stop="loadSample('https://res.cloudinary.com/dqhuvu22u/image/upload/v1765833795/papaya/20240817_091904_i3jl3s.jpg', 'sample1.jpg')"
+                                        class="px-2 py-2 bg-white border-2 border-brutal-black font-mono text-xs hover:bg-brutal-yellow hover:shadow-neo transition-all text-center">
+                                    Sampel 1
+                                </button>
+                                <button type="button"
+                                        @click.stop="loadSample('https://res.cloudinary.com/dqhuvu22u/image/upload/v1765833795/papaya/20240817_091809_oiyaaz.jpg', 'sample2.jpg')"
+                                        class="px-2 py-2 bg-white border-2 border-brutal-black font-mono text-xs hover:bg-brutal-yellow hover:shadow-neo transition-all text-center">
+                                    Sampel 2
+                                </button>
+                                <button type="button"
+                                        @click.stop="loadSample('https://res.cloudinary.com/dqhuvu22u/image/upload/v1765840828/papaya/20240817_092129_cvftih.jpg', 'sample3.jpg')"
+                                        class="px-2 py-2 bg-white border-2 border-brutal-black font-mono text-xs hover:bg-brutal-yellow hover:shadow-neo transition-all text-center">
+                                    Sampel 3
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Camera Mode -->
+                    <div x-show="useCamera" class="space-y-3">
+                        <div class="border-3 border-brutal-black bg-black relative aspect-[3/4] md:aspect-video overflow-hidden">
+                            <video x-ref="cameraVideo" 
+                                   class="w-full h-full object-cover"
+                                   autoplay 
+                                   playsinline></video>
+                            
+                            <!-- Overlay Guide -->
+                            <div class="absolute inset-0 border-2 border-white/30 m-8 pointer-events-none">
+                                <div class="absolute top-0 left-0 w-4 h-4 border-t-4 border-l-4 border-brutal-yellow"></div>
+                                <div class="absolute top-0 right-0 w-4 h-4 border-t-4 border-r-4 border-brutal-yellow"></div>
+                                <div class="absolute bottom-0 left-0 w-4 h-4 border-b-4 border-l-4 border-brutal-yellow"></div>
+                                <div class="absolute bottom-0 right-0 w-4 h-4 border-b-4 border-r-4 border-brutal-yellow"></div>
+                            </div>
+
+                            <div class="absolute bottom-6 left-1/2 -translate-x-1/2">
+                                <button type="button"
+                                        @click="capturePhoto()"
+                                        class="w-16 h-16 rounded-full bg-white border-4 border-brutal-black flex items-center justify-center hover:scale-105 transition-transform shadow-neo">
+                                    <div class="w-12 h-12 rounded-full bg-brutal-red"></div>
+                                </button>
+                            </div>
+                        </div>
+                        <p class="text-xs font-mono text-center text-brutal-gray">
+                            Pastikan daun dan koin pembanding terlihat jelas
                         </p>
-                        <div class="grid grid-cols-3 gap-2">
-                            <button type="button"
-                                    @click="fetch('https://res.cloudinary.com/dqhuvu22u/image/upload/v1765833795/papaya/20240817_091904_i3jl3s.jpg')
-                                        .then(r => r.blob())
-                                        .then(blob => {
-                                            const file = new File([blob], 'sample1.jpg', {type: 'image/jpeg'});
-                                            const dt = new DataTransfer();
-                                            dt.items.add(file);
-                                            $refs.fileInput.files = dt.files;
-                                            imagePreview = URL.createObjectURL(file);
-                                        })"
-                                    class="px-2 py-1 bg-brutal-white border-2 border-brutal-black font-mono text-xs hover:bg-brutal-yellow transition-colors">
-                                Sampel 1
-                            </button>
-                            <button type="button"
-                                    @click="fetch('https://res.cloudinary.com/dqhuvu22u/image/upload/v1765833795/papaya/20240817_091809_oiyaaz.jpg')
-                                        .then(r => r.blob())
-                                        .then(blob => {
-                                            const file = new File([blob], 'sample2.jpg', {type: 'image/jpeg'});
-                                            const dt = new DataTransfer();
-                                            dt.items.add(file);
-                                            $refs.fileInput.files = dt.files;
-                                            imagePreview = URL.createObjectURL(file);
-                                        })"
-                                    class="px-2 py-1 bg-brutal-white border-2 border-brutal-black font-mono text-xs hover:bg-brutal-yellow transition-colors">
-                                Sampel 2
-                            </button>
-                            <button type="button"
-                                    @click="fetch('https://res.cloudinary.com/dqhuvu22u/image/upload/v1765840828/papaya/20240817_092129_cvftih.jpg')
-                                        .then(r => r.blob())
-                                        .then(blob => {
-                                            const file = new File([blob], 'sample3.jpg', {type: 'image/jpeg'});
-                                            const dt = new DataTransfer();
-                                            dt.items.add(file);
-                                            $refs.fileInput.files = dt.files;
-                                            imagePreview = URL.createObjectURL(file);
-                                        })"
-                                    class="px-2 py-1 bg-brutal-white border-2 border-brutal-black font-mono text-xs hover:bg-brutal-yellow transition-colors">
-                                Sampel 3
-                            </button>
-                        </div>
                     </div>
                 </div>
-                
-                <!-- Camera Mode -->
-                <div x-show="useCamera" class="space-y-3">
-                    <div class="border-3 border-brutal-black bg-black relative">
-                        <video x-ref="cameraVideo" 
-                               class="w-full h-64 object-cover"
-                               autoplay 
-                               playsinline></video>
-                        <div class="absolute bottom-4 left-1/2 -translate-x-1/2">
-                            <button type="button"
-                                    @click="capturePhoto()"
-                                    class="bg-brutal-green border-3 border-brutal-black text-white px-6 py-2 font-mono font-bold uppercase shadow-neo hover:bg-green-600 transition-colors flex items-center gap-2">
-                                <i class="ph-bold ph-camera text-xl"></i>
-                                Capture
-                            </button>
-                        </div>
+
+                <!-- CONFIRMATION SECTION (Shown when preview exists) -->
+                <div x-show="imagePreview && !scanSuccess" class="space-y-4 animate-fade-in">
+                    <div class="border-3 border-brutal-black p-2 bg-brutal-bg relative">
+                        <img :src="imagePreview" 
+                             alt="Preview" 
+                             class="w-full max-h-[50vh] object-contain bg-white">
+                        
+                        <button type="button"
+                                @click="imagePreview = null; $refs.fileInput.value = ''"
+                                class="absolute top-4 right-4 bg-brutal-red text-white border-2 border-brutal-black p-2 shadow-neo hover:scale-105 transition-transform"
+                                title="Ganti Gambar">
+                            <i class="ph-bold ph-trash text-lg"></i>
+                        </button>
                     </div>
-                    <p class="text-xs font-mono text-brutal-gray flex items-center gap-1">
-                        <i class="ph-bold ph-info"></i>
-                        Posisikan daun + koin dalam frame, lalu klik Capture
-                    </p>
-                </div>
-                
-                <!-- Image Preview -->
-                <div x-show="imagePreview" 
-                     class="border-3 border-brutal-black p-2 bg-brutal-bg">
-                    <img :src="imagePreview" 
-                         alt="Preview" 
-                         class="w-full h-48 object-contain">
-                    <button type="button"
-                            @click="imagePreview = null; $refs.fileInput.value = ''"
-                            class="mt-2 w-full px-3 py-1 bg-brutal-red text-white border-2 border-brutal-black font-mono font-bold text-xs uppercase hover:bg-red-600 transition-colors">
-                        <i class="ph-bold ph-x"></i> Clear
-                    </button>
+
+                    <div class="bg-brutal-yellow/20 border-l-4 border-brutal-yellow p-3">
+                        <p class="font-mono text-xs font-bold text-brutal-black">
+                            <i class="ph-bold ph-check-circle"></i> Gambar siap diproses.
+                        </p>
+                        <p class="font-mono text-xs text-brutal-gray mt-1">
+                            Klik tombol "SCAN SEKARANG" untuk memulai deteksi.
+                        </p>
+                    </div>
                 </div>
                 
                 <!-- Loading Indicator -->
                 <div x-show="scanning" 
                      class="border-3 border-brutal-yellow bg-brutal-yellow/20 p-4 text-center">
                     <i class="ph-bold ph-spinner text-4xl animate-spin inline-block"></i>
-                    <p class="font-mono font-bold mt-2">PROCESSING...</p>
+                    <p class="font-mono font-bold mt-2">SEDANG MEMPROSES...</p>
                 </div>
                 
                 <!-- Result Area -->
                 <div id="scan-result"></div>
                 
-                <!-- Buttons -->
+                <!-- Footer Buttons -->
                 <div class="flex gap-3 pt-4 border-t-3 border-brutal-black">
                     <button type="button"
                             onclick="document.getElementById('modal-container').innerHTML = ''"
-                            :class="scanSuccess ? 'flex-1 btn-brutal border-3 border-brutal-black' : 'flex-1 bg-gray-200 px-4 py-2 font-mono font-bold uppercase hover:bg-gray-300 transition-colors'">
+                            :class="scanSuccess ? 'flex-1 btn-brutal border-3 border-brutal-black' : 'flex-1 bg-gray-200 px-4 py-2 font-mono font-bold uppercase hover:bg-gray-300 transition-colors border-2 border-transparent'">
                         Tutup
                     </button>
+                    
+                    <!-- Scan Button only shows in Confirmation Step -->
                     <button type="submit"
-                            x-show="!scanSuccess"
+                            x-show="imagePreview && !scanSuccess"
                             :disabled="scanning"
-                            class="flex-1 btn-brutal border-3 border-brutal-black disabled:opacity-50 disabled:cursor-not-allowed">
-                        Scan
+                            class="flex-1 btn-brutal border-3 border-brutal-black disabled:opacity-50 disabled:cursor-not-allowed bg-brutal-green text-white hover:bg-green-600">
+                        SCAN SEKARANG
                     </button>
                 </div>
             </form>

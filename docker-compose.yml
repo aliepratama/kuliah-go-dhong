@@ -39,6 +39,18 @@ services:
       - smart-garden-network
     restart: unless-stopped
 
+  ngrok:
+    image: ngrok/ngrok:latest
+    container_name: ngrok_tunnel
+    restart: unless-stopped
+    command: "http --domain=${NGROK_DOMAIN} web:8000"
+    environment:
+      NGROK_AUTHTOKEN: ${NGROK_AUTHTOKEN}
+    ports:
+      - "4040:4040"
+    networks:
+      - smart-garden-network
+
 volumes:
   postgres_data:
     driver: local
