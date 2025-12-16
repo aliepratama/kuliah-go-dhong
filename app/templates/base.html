@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="manifest" href="/static/manifest.json">
+    <meta name="theme-color" content="#00A86B">
     <title>{% block title %}Smart Garden Manager{% endblock %}</title>
     
     <!-- TailwindCSS CDN -->
@@ -127,5 +129,62 @@
     </footer>
     
     {% block scripts %}{% endblock %}
+
+    <!-- Offline Notification -->
+    <div id="offline-status" class="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 hidden transition-opacity duration-300">
+        <div class="bg-brutal-black text-white px-4 py-2 font-mono font-bold border-2 border-white shadow-neo flex items-center gap-2">
+            <i class="ph-bold ph-wifi-slash"></i>
+            OFFLINE MODE
+        </div>
+    </div>
+
+    <script>
+        // Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/static/sw.js')
+                    .then(registration => {
+                        console.log('ServiceWorker registration successful');
+                    })
+                    .catch(err => {
+                        console.log('ServiceWorker registration failed: ', err);
+                    });
+            });
+        }
+
+        // Online/Offline Status
+        const statusDiv = document.getElementById('offline-status');
+        
+        function showOffline() {
+            statusDiv.innerHTML = `
+                <div class="bg-brutal-black text-white px-4 py-2 font-mono font-bold border-2 border-white shadow-neo flex items-center gap-2">
+                    <i class="ph-bold ph-wifi-slash"></i>
+                    OFFLINE MODE
+                </div>
+            `;
+            statusDiv.classList.remove('hidden');
+        }
+
+        function showOnline() {
+            statusDiv.innerHTML = `
+                <div class="bg-brutal-green text-white px-4 py-2 font-mono font-bold border-2 border-brutal-black shadow-neo flex items-center gap-2">
+                    <i class="ph-bold ph-wifi-high"></i>
+                    ONLINE
+                </div>
+            `;
+            statusDiv.classList.remove('hidden');
+            setTimeout(() => {
+                statusDiv.classList.add('hidden');
+            }, 3000);
+        }
+
+        window.addEventListener('online', showOnline);
+        window.addEventListener('offline', showOffline);
+        
+        // Initial check
+        if (!navigator.onLine) {
+            showOffline();
+        }
+    </script>
 </body>
 </html>

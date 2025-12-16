@@ -1,0 +1,21 @@
+{
+  "name": "Go-Dhong Garden Manager",
+  "short_name": "Go-Dhong",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F4F1EA",
+  "theme_color": "#00A86B",
+  "description": "Smart Garden Manager with AI Leaf Analysis",
+  "icons": [
+    {
+      "src": "https://via.placeholder.com/192x192.png?text=Go-Dhong",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://via.placeholder.com/512x512.png?text=Go-Dhong",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
