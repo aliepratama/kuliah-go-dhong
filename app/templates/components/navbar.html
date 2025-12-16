@@ -13,14 +13,14 @@
             
             <!-- Navigation Buttons -->
             <div class="flex gap-2">
-                <a href="/" class="px-4 py-2 border-3 border-brutal-black font-mono font-bold uppercase hover:bg-brutal-yellow transition-colors {% if request.url.path == '/' %}bg-brutal-yellow{% else %}bg-brutal-white{% endif %}">
-                    <i class="ph-bold ph-map-trifold"></i> Garden
+                <a href="/" class="px-3 md:px-4 py-2 border-3 border-brutal-black font-mono font-bold uppercase hover:bg-brutal-yellow transition-colors {% if request.url.path == '/' %}bg-brutal-yellow{% else %}bg-brutal-white{% endif %}">
+                    <i class="ph-bold ph-map-trifold text-lg md:text-base"></i> <span class="hidden md:inline">Garden</span>
                 </a>
-                <a href="/history" class="px-4 py-2 border-3 border-brutal-black bg-brutal-white font-mono font-bold uppercase hover:bg-brutal-yellow transition-colors {% if request.url.path == '/history' %}bg-brutal-yellow{% endif %}">
-                    <i class="ph-bold ph-archive-box"></i> History
+                <a href="/history" class="px-3 md:px-4 py-2 border-3 border-brutal-black bg-brutal-white font-mono font-bold uppercase hover:bg-brutal-yellow transition-colors {% if request.url.path == '/history' %}bg-brutal-yellow{% endif %}">
+                    <i class="ph-bold ph-archive-box text-lg md:text-base"></i> <span class="hidden md:inline">History</span>
                 </a>
-                <a href="/guide" class="px-4 py-2 border-3 border-brutal-black bg-brutal-white font-mono font-bold uppercase hover:bg-brutal-yellow transition-colors {% if request.url.path == '/guide' %}bg-brutal-yellow{% endif %}">
-                    <i class="ph-bold ph-book-open"></i> Petunjuk
+                <a href="/guide" class="px-3 md:px-4 py-2 border-3 border-brutal-black bg-brutal-white font-mono font-bold uppercase hover:bg-brutal-yellow transition-colors {% if request.url.path == '/guide' %}bg-brutal-yellow{% endif %}">
+                    <i class="ph-bold ph-book-open text-lg md:text-base"></i> <span class="hidden md:inline">Petunjuk</span>
                 </a>
             </div>
         </div>

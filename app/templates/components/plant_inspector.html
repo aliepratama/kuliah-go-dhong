@@ -1,5 +1,5 @@
 <!-- Plant Inspector Panel (Right Side) -->
-<div id="plant-inspector" class="card-brutal min-h-[600px]"
+<div id="plant-inspector" class="card-brutal min-h-[400px] lg:min-h-[600px]"
      {% if plant %}
      hx-get="/api/plant-detail-by-id/{{ plant.id }}"
      hx-trigger="scanCompleted from:body"

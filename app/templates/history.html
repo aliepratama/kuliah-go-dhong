@@ -116,9 +116,9 @@
             <div class="card-brutal hover:shadow-neo-lg transition-shadow cursor-pointer"
                  @click="htmx.ajax('GET', `/api/scan-detail-modal/${scan.id}`, '#modal-container')"
                  hx-swap="innerHTML">
-                <div class="flex items-start gap-4">
+                <div class="flex flex-col sm:flex-row items-start gap-4">
                     <!-- Thumbnail -->
-                    <div class="border-3 border-brutal-black w-24 h-24 flex-shrink-0 bg-brutal-bg flex items-center justify-center overflow-hidden">
+                    <div class="border-3 border-brutal-black w-full sm:w-24 h-48 sm:h-24 flex-shrink-0 bg-brutal-bg flex items-center justify-center overflow-hidden">
                         <template x-if="scan.segmented_image_path">
                             <img :src="scan.segmented_image_path" 
                                  :alt="`Scan ${scan.id}`"
@@ -130,7 +130,7 @@
                     </div>
                     
                     <!-- Info -->
-                    <div class="flex-1">
+                    <div class="flex-1 w-full">
                         <div class="flex items-center justify-between mb-2">
                             <h3 class="font-sans font-black text-lg" x-text="scan.plant_name"></h3>
                             <span class="font-mono text-xs text-brutal-gray" x-text="formatDate(scan.created_at)"></span>

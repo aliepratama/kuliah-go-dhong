@@ -9,8 +9,9 @@
     </h2>
     
     {% if garden %}
-    <div class="grid gap-3" style="grid-template-columns: repeat({{ garden.cols }}, minmax(0, 1fr))">
-        {% for x in range(garden.rows) %}
+    <div class="overflow-x-auto pb-2">
+        <div class="grid gap-3 min-w-[300px]" style="grid-template-columns: repeat({{ garden.cols }}, minmax(0, 1fr))">
+            {% for x in range(garden.rows) %}
             {% for y in range(garden.cols) %}
             {% set plant = plants_grid.get((x, y)) %}
             
@@ -44,7 +45,8 @@
             </div>
             {% endif %}
             {% endfor %}
-        {% endfor %}
+            {% endfor %}
+        </div>
     </div>
     {% else %}
     <!-- No Garden State -->

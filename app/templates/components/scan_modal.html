@@ -37,7 +37,7 @@
      @toggle-camera.window="useCamera = !useCamera; useCamera ? startCamera() : stopCamera()"
      x-init="$watch('useCamera', value => { if(value) startCamera(); else stopCamera(); })"
      id="scan-modal">
-    <div class="bg-brutal-white border-4 border-brutal-black shadow-neo-lg max-w-lg w-full max-h-[90vh] overflow-y-auto">
+    <div class="bg-brutal-white border-4 border-brutal-black shadow-neo-lg max-w-lg w-full max-h-[90vh] overflow-y-auto mx-4">
         <div class="sticky top-0 bg-brutal-white border-b-3 border-brutal-black p-6 pb-3 z-10">
             <h3 class="text-xl font-sans font-black">SCAN DAUN BARU</h3>
             <p class="text-xs font-mono text-brutal-gray mt-1">ID Tanaman: {{ plant_id }}</p>
