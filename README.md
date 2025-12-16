@@ -49,13 +49,20 @@ Aplikasi ini dirancang untuk berjalan di dalam container Docker untuk kemudahan 
 2. **Siapkan Model**
    Pastikan file model `best.pt` ada di folder `models/`.
 
-3. **Jalankan dengan Docker Compose**
+3. **Konfigurasi Environment**
+   Salin file `.env.example` menjadi `.env` dan sesuaikan konfigurasinya.
+   ```bash
+   cp .env.example .env
+   ```
+   Sesuaikan variabel di dalam file `.env` jika diperlukan (misalnya untuk Ngrok atau database).
+
+4. **Jalankan dengan Docker Compose**
    ```bash
    docker-compose up --build
    ```
    _Proses ini akan mendownload image yang dibutuhkan dan membangun container aplikasi._
 
-4. **Akses Aplikasi**
+5. **Akses Aplikasi**
    Buka browser dan kunjungi:
    - **Dashboard**: [http://localhost:8000](http://localhost:8000)
    - **Dokumentasi API**: [http://localhost:8000/docs](http://localhost:8000/docs)
